@@ -345,6 +345,7 @@ function setFilter(f) {
   activeFilter = f;
   document.querySelectorAll('#f-all,#f-Urgente,#f-Média,#f-Baixa').forEach(b=>b.classList.remove('active'));
   document.getElementById('f-'+f)?.classList.add('active');
+  buildSetorBtns();
   render(getFiltered());
 }
 
@@ -352,21 +353,42 @@ function setPeriod(p) {
   activePeriod = p;
   document.querySelectorAll('#p-total,#p-hoje,#p-semana,#p-semana_ant,#p-mes,#p-mes_ant').forEach(b=>b.classList.remove('active'));
   document.getElementById('p-'+p)?.classList.add('active');
+  buildSetorBtns();
   render(getFiltered());
 }
 
-function setSetor(s) {
+function setSetor(s, sid) {
   activeSetor = s;
   document.querySelectorAll('[id^="s-"]').forEach(b=>b.classList.remove('active'));
-  document.getElementById('s-'+s)?.classList.add('active');
+  if (s === 'all') document.getElementById('s-all').classList.add('active');
+  else if (sid) document.getElementById(sid)?.classList.add('active');
   render(getFiltered());
 }
 
 function buildSetorBtns() {
-  const setores = [...new Set(allData.map(r=>(r[COL.SETOR_ORIG]||'').toString().trim()).filter(Boolean))].sort();
-  document.getElementById('setorBtns').innerHTML = setores.map(s =>
-    `<button class="filter-btn" onclick="setSetor('${s.replace(/'/g,"\'")}')" id="s-${s.replace(/\s+/g,'_')}">${s}</button>`
-  ).join('');
+  // Filtra por período e prioridade, mas ignora o setor ativo
+  let data = allData;
+  if (activeFilter !== 'all')
+    data = data.filter(r => (r[COL.PRIORIDADE]||'').toString().trim() === activeFilter);
+  const range = getPeriodRange();
+  if (range) {
+    const [ini, fim] = range;
+    data = data.filter(r => { const d=parseDate(r[COL.DATA]); return d && d>=ini && d<=fim; });
+  }
+
+  const setores = [...new Set(data.map(r=>(r[COL.SETOR_ORIG]||'').toString().trim()).filter(Boolean))].sort();
+
+  // Se o setor ativo não existe mais no período, reseta para 'all'
+  if (activeSetor !== 'all' && !setores.includes(activeSetor)) {
+    activeSetor = 'all';
+    document.getElementById('s-all').classList.add('active');
+  }
+
+  document.getElementById('setorBtns').innerHTML = setores.map(s => {
+    const sid = 's-' + s.replace(/[^a-zA-Z0-9]/g, '_');
+    const isActive = activeSetor === s ? 'active' : '';
+    return `<button class="filter-btn ${isActive}" onclick="setSetor('${s.replace(/'/g, "\'")}','${sid}')" id="${sid}">${s}</button>`;
+  }).join('');
 }
 
 // ── HELPERS ────────────────────────────────────────────────────────────
