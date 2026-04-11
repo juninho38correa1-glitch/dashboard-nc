@@ -139,6 +139,13 @@
       <button class="filter-btn"        onclick="setPeriod('mes_ant')"    id="p-mes_ant">Mês anterior</button>
     </div>
 
+    <!-- FILTRO SETOR -->
+    <div class="filters" style="margin-bottom:20px;">
+      <span class="filter-label">Setor:</span>
+      <button class="filter-btn active" onclick="setSetor('all')" id="s-all">Todos</button>
+      <span id="setorBtns"></span>
+    </div>
+
     <!-- MÉTRICAS -->
     <div class="metrics">
       <div class="metric m-purple">
@@ -254,6 +261,7 @@ const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzB_rXJGFEfDWEwbgKTL
 let allData      = [];
 let indData      = [];
 let activeFilter = 'all';
+let activeSetor   = 'all';
 let activePeriod = 'total';
 let charts       = {};
 
@@ -281,6 +289,7 @@ async function loadData() {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
     document.getElementById('lastUpdate').textContent = 'Atualizado ' + new Date().toLocaleTimeString('pt-BR');
+    buildSetorBtns();
     render(getFiltered());
     renderIndicador(indData);
   } catch(e) {
@@ -327,6 +336,8 @@ function getFiltered() {
     const [ini, fim] = range;
     data = data.filter(r => { const d=parseDate(r[COL.DATA]); return d && d>=ini && d<=fim; });
   }
+  if (activeSetor !== 'all')
+    data = data.filter(r => (r[COL.SETOR_ORIG]||'').toString().trim() === activeSetor);
   return data;
 }
 
@@ -342,6 +353,20 @@ function setPeriod(p) {
   document.querySelectorAll('#p-total,#p-hoje,#p-semana,#p-semana_ant,#p-mes,#p-mes_ant').forEach(b=>b.classList.remove('active'));
   document.getElementById('p-'+p)?.classList.add('active');
   render(getFiltered());
+}
+
+function setSetor(s) {
+  activeSetor = s;
+  document.querySelectorAll('[id^="s-"]').forEach(b=>b.classList.remove('active'));
+  document.getElementById('s-'+s)?.classList.add('active');
+  render(getFiltered());
+}
+
+function buildSetorBtns() {
+  const setores = [...new Set(allData.map(r=>(r[COL.SETOR_ORIG]||'').toString().trim()).filter(Boolean))].sort();
+  document.getElementById('setorBtns').innerHTML = setores.map(s =>
+    `<button class="filter-btn" onclick="setSetor('${s.replace(/'/g,"\'")}')" id="s-${s.replace(/\s+/g,'_')}">${s}</button>`
+  ).join('');
 }
 
 // ── HELPERS ────────────────────────────────────────────────────────────
