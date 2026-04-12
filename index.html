@@ -345,7 +345,6 @@ function setFilter(f) {
   activeFilter = f;
   document.querySelectorAll('#f-all,#f-Urgente,#f-Média,#f-Baixa').forEach(b=>b.classList.remove('active'));
   document.getElementById('f-'+f)?.classList.add('active');
-  buildSetorBtns();
   render(getFiltered());
 }
 
@@ -353,42 +352,21 @@ function setPeriod(p) {
   activePeriod = p;
   document.querySelectorAll('#p-total,#p-hoje,#p-semana,#p-semana_ant,#p-mes,#p-mes_ant').forEach(b=>b.classList.remove('active'));
   document.getElementById('p-'+p)?.classList.add('active');
-  buildSetorBtns();
   render(getFiltered());
 }
 
-function setSetor(s, sid) {
+function setSetor(s) {
   activeSetor = s;
   document.querySelectorAll('[id^="s-"]').forEach(b=>b.classList.remove('active'));
-  if (s === 'all') document.getElementById('s-all').classList.add('active');
-  else if (sid) document.getElementById(sid)?.classList.add('active');
+  document.getElementById('s-'+s)?.classList.add('active');
   render(getFiltered());
 }
 
 function buildSetorBtns() {
-  // Filtra por período e prioridade, mas ignora o setor ativo
-  let data = allData;
-  if (activeFilter !== 'all')
-    data = data.filter(r => (r[COL.PRIORIDADE]||'').toString().trim() === activeFilter);
-  const range = getPeriodRange();
-  if (range) {
-    const [ini, fim] = range;
-    data = data.filter(r => { const d=parseDate(r[COL.DATA]); return d && d>=ini && d<=fim; });
-  }
-
-  const setores = [...new Set(data.map(r=>(r[COL.SETOR_ORIG]||'').toString().trim()).filter(Boolean))].sort();
-
-  // Se o setor ativo não existe mais no período, reseta para 'all'
-  if (activeSetor !== 'all' && !setores.includes(activeSetor)) {
-    activeSetor = 'all';
-    document.getElementById('s-all').classList.add('active');
-  }
-
-  document.getElementById('setorBtns').innerHTML = setores.map(s => {
-    const sid = 's-' + s.replace(/[^a-zA-Z0-9]/g, '_');
-    const isActive = activeSetor === s ? 'active' : '';
-    return `<button class="filter-btn ${isActive}" onclick="setSetor('${s.replace(/'/g, "\'")}','${sid}')" id="${sid}">${s}</button>`;
-  }).join('');
+  const setores = [...new Set(allData.map(r=>(r[COL.SETOR_ORIG]||'').toString().trim()).filter(Boolean))].sort();
+  document.getElementById('setorBtns').innerHTML = setores.map(s =>
+    `<button class="filter-btn" onclick="setSetor('${s.replace(/'/g,"\'")}')" id="s-${s.replace(/\s+/g,'_')}">${s}</button>`
+  ).join('');
 }
 
 // ── HELPERS ────────────────────────────────────────────────────────────
@@ -522,26 +500,15 @@ function renderIndicador(rows) {
   document.getElementById('cardIndicador').style.display='block';
   const labels = rows.map(r=>(r[0]||'').toString().trim().slice(0,3)+' S'+(r[1]||'').toString().trim());
   const mult   = rows.map(r=>parseFloat((r[5]||'0').toString().replace(',','.'))||0);
-  // Linha de tendência linear (regressão simples)
-  const n = mult.length;
-  const sumX = mult.reduce((_,__,i)=>_+i, 0);
-  const sumY = mult.reduce((a,b)=>a+b, 0);
-  const sumXY = mult.reduce((a,v,i)=>a+i*v, 0);
-  const sumX2 = mult.reduce((a,_,i)=>a+i*i, 0);
-  const slope = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX);
-  const intercept = (sumY - slope*sumX) / n;
-  const trend = mult.map((_,i) => parseFloat((intercept + slope*i).toFixed(2)));
-
-  // Cor dos pontos: acima da tendência = vermelho, abaixo = verde
-  const pointColors = mult.map((v,i) => v > trend[i] ? '#f05b5b' : '#4ecb8d');
-
+  const META   = 3.0;
+  const pointColors = mult.map(v=>v>META?'#f05b5b':'#4ecb8d');
   if(charts['chartIndicador']) charts['chartIndicador'].destroy();
   charts['chartIndicador'] = new Chart(document.getElementById('chartIndicador'), {
     type:'line',
     data:{ labels, datasets:[
       { label:'Multiplicador /100', data:mult, borderColor:'#7c6af7', backgroundColor:'rgba(124,106,247,0.07)',
         borderWidth:2, pointRadius:5, pointBackgroundColor:pointColors, pointBorderColor:pointColors, fill:true, tension:0.3 },
-      { label:'Tendência', data:trend,
+      { label:'Meta ('+META+')', data:Array(labels.length).fill(META),
         borderColor:'#f0a63a', borderWidth:1.5, borderDash:[6,4], pointRadius:0, fill:false, tension:0 }
     ]},
     options:{ responsive:true, maintainAspectRatio:false,
@@ -555,7 +522,6 @@ function renderIndicador(rows) {
   document.getElementById('indicadorBody').innerHTML = rows.map(r => {
     const multVal = parseFloat((r[5]||'0').toString().replace(',','.'))||0;
     const pct     = parseFloat((r[4]||'0').toString().replace(',','.'));
-    const META    = 3.0;
     return `<tr>
       <td style="text-transform:capitalize">${r[0]||'—'}</td>
       <td style="font-family:var(--mono);text-align:center">${r[1]||'—'}</td>
