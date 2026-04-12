@@ -119,15 +119,6 @@
 
   <div id="dashboard">
 
-    <!-- FILTRO PRIORIDADE -->
-    <div class="filters" style="margin-bottom:8px;">
-      <span class="filter-label">Prioridade:</span>
-      <button class="filter-btn active" onclick="setFilter('all')"     id="f-all">Todos</button>
-      <button class="filter-btn"        onclick="setFilter('Urgente')" id="f-Urgente">Urgente</button>
-      <button class="filter-btn"        onclick="setFilter('Média')"   id="f-Média">Média</button>
-      <button class="filter-btn"        onclick="setFilter('Baixa')"   id="f-Baixa">Baixa</button>
-    </div>
-
     <!-- FILTRO PERÍODO -->
     <div class="filters" style="margin-bottom:20px;">
       <span class="filter-label">Período:</span>
@@ -260,7 +251,6 @@ const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzB_rXJGFEfDWEwbgKTL
 
 let allData      = [];
 let indData      = [];
-let activeFilter = 'all';
 let activeSetor   = 'all';
 let activePeriod = 'total';
 let charts       = {};
@@ -329,8 +319,6 @@ function getPeriodRange() {
 
 function getFiltered() {
   let data = allData;
-  if (activeFilter !== 'all')
-    data = data.filter(r => (r[COL.PRIORIDADE]||'').toString().trim() === activeFilter);
   const range = getPeriodRange();
   if (range) {
     const [ini, fim] = range;
@@ -339,14 +327,6 @@ function getFiltered() {
   if (activeSetor !== 'all')
     data = data.filter(r => (r[COL.SETOR_ORIG]||'').toString().trim() === activeSetor);
   return data;
-}
-
-function setFilter(f) {
-  activeFilter = f;
-  document.querySelectorAll('#f-all,#f-Urgente,#f-Média,#f-Baixa').forEach(b=>b.classList.remove('active'));
-  document.getElementById('f-'+f)?.classList.add('active');
-  buildSetorBtns();
-  render(getFiltered());
 }
 
 function setPeriod(p) {
@@ -368,8 +348,6 @@ function setSetor(s, sid) {
 function buildSetorBtns() {
   // Filtra por período e prioridade, mas ignora o setor ativo
   let data = allData;
-  if (activeFilter !== 'all')
-    data = data.filter(r => (r[COL.PRIORIDADE]||'').toString().trim() === activeFilter);
   const range = getPeriodRange();
   if (range) {
     const [ini, fim] = range;
