@@ -556,7 +556,7 @@ function renderIndicador(rows) {
     const multVal = parseFloat((r[5]||'0').toString().replace(',','.'))||0;
     const pct     = parseFloat((r[4]||'0').toString().replace(',','.'));
     const META    = 3.0;
-    return `<tr>`
+    return `<tr>
       <td style="text-transform:capitalize">${r[0]||'—'}</td>
       <td style="font-family:var(--mono);text-align:center">${r[1]||'—'}</td>
       <td style="font-family:var(--mono);text-align:center;color:var(--text)">${r[2]||'—'}</td>
