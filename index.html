@@ -78,6 +78,7 @@
   .td-desc { max-width: 260px; white-space: normal; word-break: break-word; line-height: 1.5; }
   .pill { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 10px; font-family: var(--mono); font-weight: 500; white-space: nowrap; }
   .p-urgente   { background: var(--red-bg);   color: var(--red);   border: 0.5px solid rgba(240,91,91,0.25); }
+  .p-alta      { background: rgba(240,122,58,0.1); color: #f07a3a; border: 0.5px solid rgba(240,122,58,0.25); }
   .p-media     { background: var(--amber-bg); color: var(--amber); border: 0.5px solid rgba(240,166,58,0.25); }
   .p-baixa     { background: var(--green-bg); color: var(--green); border: 0.5px solid rgba(78,203,141,0.25); }
   .p-nc        { background: var(--red-bg);   color: var(--red);   border: 0.5px solid rgba(240,91,91,0.2); }
@@ -429,7 +430,7 @@ function render(data) {
   makeDonut('chartTipo', Object.keys(tipos), Object.values(tipos), ['#f05b5b','#4ea8e8','#f0a63a','#4ecb8d','#7c6af7']);
 
   const prios = count(data, COL.PRIORIDADE);
-  const prioColors = {'Urgente':'#f05b5b','Média':'#f0a63a','Baixa':'#4ecb8d'};
+  const prioColors = {'Urgente':'#f05b5b','Alta':'#f07a3a','Média':'#f0a63a','Baixa':'#4ecb8d'};
   makeDonut('chartPrio', Object.keys(prios), Object.values(prios), Object.keys(prios).map(k=>prioColors[k]||'#9090a0'));
 
   const statuses = count(data, COL.STATUS);
@@ -473,7 +474,7 @@ function render(data) {
 
   const recent = [...data].reverse().slice(0,50);
   document.getElementById('tableCount').textContent = data.length+' registros';
-  const prioClass = {'urgente':'p-urgente','média':'p-media','baixa':'p-baixa'};
+  const prioClass = {'urgente':'p-urgente','alta':'p-alta','média':'p-media','media':'p-media','baixa':'p-baixa'};
   const tipoClass = {'não conformidade':'p-nc','melhoria':'p-melhoria','alteração':'p-alteracao','assistência':'p-assistencia','assistencia':'p-assistencia'};
   const statClass = s => { const v=s.toLowerCase(); return (v.includes('finaliz')||v.includes('atendida'))?'p-finalizado':'p-aberto'; };
   document.getElementById('tableBody').innerHTML = recent.map(r => {
