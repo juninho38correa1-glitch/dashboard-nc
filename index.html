@@ -318,7 +318,8 @@ function getPeriodRange() {
 }
 
 function getFiltered() {
-  let data = allData;
+  // Exclui registros anulados de todas as contagens
+  let data = allData.filter(r => (r[COL.STATUS]||'').toString().trim().toLowerCase() !== 'anulada');
   const range = getPeriodRange();
   if (range) {
     const [ini, fim] = range;
@@ -347,7 +348,7 @@ function setSetor(s, sid) {
 
 function buildSetorBtns() {
   // Filtra por período e prioridade, mas ignora o setor ativo
-  let data = allData;
+  let data = allData.filter(r => (r[COL.STATUS]||'').toString().trim().toLowerCase() !== 'anulada');
   const range = getPeriodRange();
   if (range) {
     const [ini, fim] = range;
