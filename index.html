@@ -103,7 +103,7 @@
   <div class="header">
     <div class="header-left">
       <span class="header-eyebrow">Gestão de qualidade</span>
-      <h1 class="header-title">Não Conformidades | Studyo 4 Estofados</h1>
+      <h1 class="header-title" id="secretTitle" onclick="handleSecretClick()" style="cursor:default;">Não Conformidades | Studyo 4 Estofados</h1>
     </div>
     <div class="header-right">
       <div class="status-dot"><span class="dot"></span><span id="lastUpdate">carregando...</span></div>
@@ -241,7 +241,7 @@
       <div style="display:flex;align-items:center;gap:16px;">
         <span class="footer-text">© Junior Corrêa · Todos os direitos reservados</span>
       </div>
-      <a class="footer-link" href="https://docs.google.com/spreadsheets/d/1l73oePNwk4bG7rL17IlOLNYs2oC1USrP1WPgtf6bTs0/edit" target="_blank">Abrir planilha ↗</a>
+      <span class="footer-text" style="opacity:0.3;font-size:10px;">v1.0</span>
     </div>
   </div>
 </div>
@@ -544,6 +544,20 @@ function renderIndicador(rows) {
       <td style="text-align:center"><span class="pill ${multVal>META?'p-urgente':'p-finalizado'}">${multVal.toFixed(1)}</span></td>
     </tr>`;
   }).join('');
+}
+
+// ── ACESSO SECRETO (3 cliques no título) ──────────────────────────────
+let secretClicks = 0;
+let secretTimer  = null;
+function handleSecretClick() {
+  secretClicks++;
+  clearTimeout(secretTimer);
+  if (secretClicks >= 3) {
+    secretClicks = 0;
+    window.open('https://docs.google.com/spreadsheets/d/1l73oePNwk4bG7rL17IlOLNYs2oC1USrP1WPgtf6bTs0/edit', '_blank');
+  } else {
+    secretTimer = setTimeout(() => { secretClicks = 0; }, 600);
+  }
 }
 
 loadData();
