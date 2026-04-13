@@ -427,7 +427,9 @@ function render(data) {
   document.getElementById('m-periodo').textContent    = (datas[0]||'—')+' → '+(datas[datas.length-1]||'—');
 
   const tipos = count(data, COL.TIPO);
-  makeDonut('chartTipo', Object.keys(tipos), Object.values(tipos), ['#f05b5b','#4ea8e8','#f0a63a','#4ecb8d','#7c6af7']);
+  // Cores fixas por tipo (independente da ordem)
+  const tipoCores = {'Não conformidade':'#f05b5b','não conformidade':'#f05b5b','Alteração':'#f0a63a','alteração':'#f0a63a','Melhoria':'#4ea8e8','melhoria':'#4ea8e8','Assistência':'#a89cf7','assistência':'#a89cf7','assistencia':'#a89cf7'};
+  makeDonut('chartTipo', Object.keys(tipos), Object.values(tipos), Object.keys(tipos).map(k=>tipoCores[k]||'#9090a0'));
 
   const prios = count(data, COL.PRIORIDADE);
   const prioColors = {'Urgente':'#f05b5b','Alta':'#f07a3a','Média':'#f0a63a','Baixa':'#4ecb8d'};
@@ -453,12 +455,13 @@ function render(data) {
   });
 
   const tipoKeys = [...new Set(data.map(r=>(r[COL.TIPO]||'').trim()).filter(Boolean))];
-  const prioKeys = ['Urgente','Média','Baixa'];
+  const prioKeys = ['Urgente','Alta','Média','Baixa'];
+  const prioBarColors = {'Urgente':'#f05b5b','Alta':'#f07a3a','Média':'#f0a63a','Baixa':'#4ecb8d'};
   if(charts['chartTipoPrio']) charts['chartTipoPrio'].destroy();
   charts['chartTipoPrio'] = new Chart(document.getElementById('chartTipoPrio'), {
     type:'bar',
-    data:{ labels:tipoKeys, datasets:prioKeys.map((p,i)=>({
-      label:p, backgroundColor:['#f05b5b','#f0a63a','#4ecb8d'][i], borderRadius:4, borderWidth:0,
+    data:{ labels:tipoKeys, datasets:prioKeys.map((p)=>({
+      label:p, backgroundColor:prioBarColors[p], borderRadius:4, borderWidth:0,
       data:tipoKeys.map(t=>data.filter(r=>r[COL.TIPO]?.trim()===t&&r[COL.PRIORIDADE]?.trim()===p).length)
     }))},
     options:{ responsive:true, maintainAspectRatio:false,
