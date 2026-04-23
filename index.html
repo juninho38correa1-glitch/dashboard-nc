@@ -98,6 +98,17 @@
   .filter-btn:hover { border-color: var(--border2); color: var(--text); }
   .filter-btn.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent2); }
   .chart-wrap { position: relative; }
+  .tr-main { cursor: pointer; transition: background 0.15s; }
+  .tr-main:hover td { background: #1e1e24; }
+  .tr-main.open td { background: rgba(124,106,247,0.06); }
+  .tr-accordion { display: none; }
+  .tr-accordion.open { display: table-row; }
+  .tr-accordion td { padding: 10px 14px 14px; border-bottom: 0.5px solid rgba(255,255,255,0.07); background: rgba(124,106,247,0.04); }
+  .accordion-label { font-size: 9px; font-family: var(--mono); color: var(--accent2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px; }
+  .accordion-text { font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .accordion-empty { font-size: 11px; color: var(--text3); font-style: italic; }
+  .tr-main td:first-child::before { content: '›'; display: inline-block; margin-right: 6px; color: var(--text3); transition: transform 0.2s; font-size: 12px; }
+  .tr-main.open td:first-child::before { transform: rotate(90deg); color: var(--accent2); }
 </style>
 </head>
 <body>
@@ -492,11 +503,13 @@ function render(data) {
   const prioClass = {'urgente':'p-urgente','alta':'p-alta','média':'p-media','media':'p-media','baixa':'p-baixa'};
   const tipoClass = {'não conformidade':'p-nc','melhoria':'p-melhoria','alteração':'p-alteracao','assistência':'p-assistencia','assistencia':'p-assistencia'};
   const statClass = s => { const v=s.toLowerCase(); if(v==='anulada') return 'p-anulada'; return (v.includes('finaliz')||v.includes('atendida'))?'p-finalizado':'p-aberto'; };
-  document.getElementById('tableBody').innerHTML = recent.map(r => {
+  document.getElementById('tableBody').innerHTML = recent.map((r, i) => {
     const pKey=(r[COL.PRIORIDADE]||'').toString().trim().toLowerCase();
     const tKey=(r[COL.TIPO]||'').toString().trim().toLowerCase();
     const sVal=(r[COL.STATUS]||'').toString().trim();
-    return `<tr>
+    const impacto=(r[COL.IMPACTO]||'').toString().trim();
+    const uid = 'acc-'+i;
+    return `<tr class="tr-main" onclick="toggleAccordion('${uid}', this)">
       <td class="td-date">${r[COL.DATA]||'—'}</td>
       <td style="font-family:var(--mono);font-size:11px;color:var(--text3)">${r[COL.NUM_PED]||'—'}</td>
       <td class="td-prod">${r[COL.PRODUTO]||'—'}</td>
@@ -508,6 +521,12 @@ function render(data) {
       <td><span class="pill ${tipoClass[tKey]||'p-aberto'}">${r[COL.TIPO]||'—'}</span></td>
       <td><span class="pill ${statClass(sVal)}">${sVal||'—'}</span></td>
       <td style="color:var(--text3)">${r[COL.RESPONSAVEL]||'—'}</td>
+    </tr>
+    <tr class="tr-accordion" id="${uid}">
+      <td colspan="11">
+        <div class="accordion-label">Tratativa / Impacto</div>
+        ${impacto ? `<div class="accordion-text">${impacto}</div>` : '<div class="accordion-empty">Nenhuma tratativa registrada.</div>'}
+      </td>
     </tr>`;
   }).join('');
 }
@@ -561,6 +580,14 @@ function renderIndicador(rows) {
       <td style="text-align:center"><span class="pill ${multVal>META?'p-urgente':'p-finalizado'}">${multVal.toFixed(1)}</span></td>
     </tr>`;
   }).join('');
+}
+
+// ── ACCORDION ─────────────────────────────────────────────────────────
+function toggleAccordion(uid, row) {
+  const acc = document.getElementById(uid);
+  const isOpen = acc.classList.contains('open');
+  acc.classList.toggle('open', !isOpen);
+  row.classList.toggle('open', !isOpen);
 }
 
 // ── ACESSO SECRETO (3 cliques no título) ──────────────────────────────
