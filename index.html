@@ -87,6 +87,7 @@
   .p-assistencia{ background: var(--accent-glow); color: var(--accent2); border: 0.5px solid rgba(124,106,247,0.25); }
   .p-finalizado{ background: var(--green-bg); color: var(--green); border: 0.5px solid rgba(78,203,141,0.2); }
   .p-aberto    { background: var(--bg4);      color: var(--text3); border: 0.5px solid var(--border2); }
+  .p-anulada   { background: rgba(90,90,106,0.15); color: #5a5a6a; border: 0.5px solid rgba(90,90,106,0.3); text-decoration: line-through; }
   .footer { margin-top: 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
   .footer-text { font-size: 11px; font-family: var(--mono); color: var(--text3); }
   .footer-link { font-size: 11px; font-family: var(--mono); color: var(--accent2); text-decoration: none; }
@@ -133,10 +134,12 @@
     </div>
 
     <!-- FILTRO SETOR -->
-    <div class="filters" style="margin-bottom:20px;">
-      <span class="filter-label">Setor:</span>
-      <button class="filter-btn active" onclick="setSetor('all')" id="s-all">Todos</button>
-      <span id="setorBtns"></span>
+    <div class="filters" style="margin-bottom:20px;align-items:flex-start;">
+      <span class="filter-label" style="padding-top:6px;">Setor:</span>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <button class="filter-btn active" onclick="setSetor('all')" id="s-all">Todos</button>
+        <span id="setorBtns" style="display:contents;"></span>
+      </div>
     </div>
 
     <!-- MÉTRICAS -->
@@ -475,11 +478,20 @@ function render(data) {
   makeBars('barSetores',    count(data,COL.SETOR_ORIG), '#7c6af7');
   makeBars('barSolicitantes',count(data,COL.SOLICITANTE),'#4ea8e8');
 
-  const recent = [...data].reverse().slice(0,50);
-  document.getElementById('tableCount').textContent = data.length+' registros';
+  // Tabela mostra todos os registros (incluindo anulados), aplicando só período e setor
+  let tableData = allData;
+  const tableRange = getPeriodRange();
+  if (tableRange) {
+    const [ini, fim] = tableRange;
+    tableData = tableData.filter(r => { const d=parseDate(r[COL.DATA]); return d && d>=ini && d<=fim; });
+  }
+  if (activeSetor !== 'all')
+    tableData = tableData.filter(r => (r[COL.SETOR_ORIG]||'').toString().trim() === activeSetor);
+  const recent = [...tableData].reverse().slice(0,50);
+  document.getElementById('tableCount').textContent = tableData.length+' registros';
   const prioClass = {'urgente':'p-urgente','alta':'p-alta','média':'p-media','media':'p-media','baixa':'p-baixa'};
   const tipoClass = {'não conformidade':'p-nc','melhoria':'p-melhoria','alteração':'p-alteracao','assistência':'p-assistencia','assistencia':'p-assistencia'};
-  const statClass = s => { const v=s.toLowerCase(); return (v.includes('finaliz')||v.includes('atendida'))?'p-finalizado':'p-aberto'; };
+  const statClass = s => { const v=s.toLowerCase(); if(v==='anulada') return 'p-anulada'; return (v.includes('finaliz')||v.includes('atendida'))?'p-finalizado':'p-aberto'; };
   document.getElementById('tableBody').innerHTML = recent.map(r => {
     const pKey=(r[COL.PRIORIDADE]||'').toString().trim().toLowerCase();
     const tKey=(r[COL.TIPO]||'').toString().trim().toLowerCase();
