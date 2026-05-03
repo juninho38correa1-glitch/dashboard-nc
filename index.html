@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -98,6 +99,15 @@
   .filter-btn:hover { border-color: var(--border2); color: var(--text); }
   .filter-btn.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent2); }
   .chart-wrap { position: relative; }
+  .search-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .search-input { flex: 1; max-width: 360px; background: var(--bg3); border: 0.5px solid var(--border2); border-radius: var(--r); color: var(--text); font-family: var(--font); font-size: 13px; padding: 8px 14px 8px 36px; outline: none; transition: border-color 0.2s; }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text3); }
+  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text3); pointer-events: none; }
+  .search-box { position: relative; flex: 1; max-width: 360px; }
+  .search-clear { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 16px; padding: 0 4px; display: none; }
+  .search-clear:hover { color: var(--text); }
+  .search-count { font-size: 11px; font-family: var(--mono); color: var(--text3); }
   .tr-main { cursor: pointer; transition: background 0.15s; }
   .tr-main:hover td { background: #1e1e24; }
   .tr-main.open td { background: rgba(124,106,247,0.06); }
@@ -153,132 +163,143 @@
 
   <div id="dashboard">
 
-    <!-- FILTRO PERÍODO -->
-    <div class="filters" style="margin-bottom:20px;">
-      <span class="filter-label">Período:</span>
-      <button class="filter-btn active" onclick="setPeriod('total')"      id="p-total">Total</button>
-      <button class="filter-btn"        onclick="setPeriod('hoje')"       id="p-hoje">Hoje</button>
-      <button class="filter-btn"        onclick="setPeriod('semana')"     id="p-semana">Esta semana</button>
-      <button class="filter-btn"        onclick="setPeriod('semana_ant')" id="p-semana_ant">Semana anterior</button>
-      <button class="filter-btn"        onclick="setPeriod('mes')"        id="p-mes">Este mês</button>
-      <button class="filter-btn"        onclick="setPeriod('mes_ant')"    id="p-mes_ant">Mês anterior</button>
-    </div>
+```
+<!-- FILTRO PERÍODO -->
+<div class="filters" style="margin-bottom:20px;">
+  <span class="filter-label">Período:</span>
+  <button class="filter-btn active" onclick="setPeriod('total')"      id="p-total">Total</button>
+  <button class="filter-btn"        onclick="setPeriod('hoje')"       id="p-hoje">Hoje</button>
+  <button class="filter-btn"        onclick="setPeriod('semana')"     id="p-semana">Esta semana</button>
+  <button class="filter-btn"        onclick="setPeriod('semana_ant')" id="p-semana_ant">Semana anterior</button>
+  <button class="filter-btn"        onclick="setPeriod('mes')"        id="p-mes">Este mês</button>
+  <button class="filter-btn"        onclick="setPeriod('mes_ant')"    id="p-mes_ant">Mês anterior</button>
+</div>
 
-    <!-- FILTRO SETOR -->
-    <div class="filters" style="margin-bottom:20px;align-items:flex-start;">
-      <span class="filter-label" style="padding-top:6px;">Setor:</span>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;">
-        <button class="filter-btn active" onclick="setSetor('all')" id="s-all">Todos</button>
-        <span id="setorBtns" style="display:contents;"></span>
-      </div>
-    </div>
+<!-- FILTRO SETOR -->
+<div class="filters" style="margin-bottom:20px;align-items:flex-start;">
+  <span class="filter-label" style="padding-top:6px;">Setor:</span>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;">
+    <button class="filter-btn active" onclick="setSetor('all')" id="s-all">Todos</button>
+    <span id="setorBtns" style="display:contents;"></span>
+  </div>
+</div>
 
-    <!-- MÉTRICAS -->
-    <div class="metrics">
-      <div class="metric m-purple">
-        <div class="metric-label">Total de registros</div>
-        <div class="metric-value" id="m-total">—</div>
-        <div class="metric-sub" id="m-periodo">—</div>
-      </div>
-      <div class="metric m-red">
-        <div class="metric-label">Urgentes em aberto</div>
-        <div class="metric-value" id="m-urgentes">—</div>
-        <div class="metric-sub">Requerem atenção imediata</div>
-      </div>
-      <div class="metric m-amber">
-        <div class="metric-label">Em andamento</div>
-        <div class="metric-value" id="m-abertos">—</div>
-        <div class="metric-sub">Ainda não resolvidos</div>
-      </div>
-      <div class="metric m-green">
-        <div class="metric-label">Resolvidos</div>
-        <div class="metric-value" id="m-finalizados">—</div>
-        <div class="metric-sub" id="m-taxa">— taxa de resolução</div>
-      </div>
-      <div class="metric m-blue">
-        <div class="metric-label">Setores envolvidos</div>
-        <div class="metric-value" id="m-setores">—</div>
-        <div class="metric-sub">Setores distintos</div>
-      </div>
-    </div>
+<!-- MÉTRICAS -->
+<div class="metrics">
+  <div class="metric m-purple">
+    <div class="metric-label">Total de registros</div>
+    <div class="metric-value" id="m-total">—</div>
+    <div class="metric-sub" id="m-periodo">—</div>
+  </div>
+  <div class="metric m-red">
+    <div class="metric-label">Urgentes em aberto</div>
+    <div class="metric-value" id="m-urgentes">—</div>
+    <div class="metric-sub">Requerem atenção imediata</div>
+  </div>
+  <div class="metric m-amber">
+    <div class="metric-label">Em andamento</div>
+    <div class="metric-value" id="m-abertos">—</div>
+    <div class="metric-sub">Ainda não resolvidos</div>
+  </div>
+  <div class="metric m-green">
+    <div class="metric-label">Resolvidos</div>
+    <div class="metric-value" id="m-finalizados">—</div>
+    <div class="metric-sub" id="m-taxa">— taxa de resolução</div>
+  </div>
+  <div class="metric m-blue">
+    <div class="metric-label">Setores envolvidos</div>
+    <div class="metric-value" id="m-setores">—</div>
+    <div class="metric-sub">Setores distintos</div>
+  </div>
+</div>
 
-    <div class="grid2" style="margin-bottom:14px;">
-      <div class="card">
-        <div class="card-title">Registros por dia</div>
-        <div class="chart-wrap" style="height:200px;"><canvas id="chartDia" role="img" aria-label="Registros por dia"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Tipo × Prioridade</div>
-        <div class="chart-wrap" style="height:200px;"><canvas id="chartTipoPrio" role="img" aria-label="Tipo por prioridade"></canvas></div>
-      </div>
-    </div>
+<div class="grid2" style="margin-bottom:14px;">
+  <div class="card">
+    <div class="card-title">Registros por dia</div>
+    <div class="chart-wrap" style="height:200px;"><canvas id="chartDia" role="img" aria-label="Registros por dia"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Tipo × Prioridade</div>
+    <div class="chart-wrap" style="height:200px;"><canvas id="chartTipoPrio" role="img" aria-label="Tipo por prioridade"></canvas></div>
+  </div>
+</div>
 
-    <div class="grid3" style="margin-bottom:14px;">
-      <div class="card">
-        <div class="card-title">Por tipo de solicitação</div>
-        <div class="chart-wrap" style="height:170px;"><canvas id="chartTipo" role="img" aria-label="Tipo de solicitação"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Por prioridade</div>
-        <div class="chart-wrap" style="height:170px;"><canvas id="chartPrio" role="img" aria-label="Prioridade"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Por status</div>
-        <div class="chart-wrap" style="height:170px;"><canvas id="chartStatus" role="img" aria-label="Status"></canvas></div>
-      </div>
-    </div>
+<div class="grid3" style="margin-bottom:14px;">
+  <div class="card">
+    <div class="card-title">Por tipo de solicitação</div>
+    <div class="chart-wrap" style="height:170px;"><canvas id="chartTipo" role="img" aria-label="Tipo de solicitação"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Por prioridade</div>
+    <div class="chart-wrap" style="height:170px;"><canvas id="chartPrio" role="img" aria-label="Prioridade"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Por status</div>
+    <div class="chart-wrap" style="height:170px;"><canvas id="chartStatus" role="img" aria-label="Status"></canvas></div>
+  </div>
+</div>
 
-    <div class="grid2" style="margin-bottom:14px;">
-      <div class="card">
-        <div class="card-title">Registros por setor de origem</div>
-        <div class="bar-list" id="barSetores"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Top solicitantes</div>
-        <div class="bar-list" id="barSolicitantes"></div>
-      </div>
-    </div>
+<div class="grid2" style="margin-bottom:14px;">
+  <div class="card">
+    <div class="card-title">Registros por setor de origem</div>
+    <div class="bar-list" id="barSetores"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Top solicitantes</div>
+    <div class="bar-list" id="barSolicitantes"></div>
+  </div>
+</div>
 
-    <div class="card" style="margin-bottom:14px;">
-      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
-        <span>Últimos registros</span>
-        <span id="tableCount" style="color:var(--accent2);font-family:var(--mono);font-size:11px;"></span>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr>
-            <th>Data do registro</th><th>Nº Ped.</th><th>Produto</th><th>Módulo</th>
-            <th>Setor origem</th><th>Solicitante</th><th>Alteração solicitada</th>
-            <th>Prioridade</th><th>Tipo</th><th>Status</th><th>Responsável</th>
-          </tr></thead>
-          <tbody id="tableBody"></tbody>
-        </table>
-      </div>
+<div class="card" style="margin-bottom:14px;">
+  <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <span>Últimos registros</span>
+    <span id="tableCount" style="color:var(--accent2);font-family:var(--mono);font-size:11px;"></span>
+  </div>
+  <div class="search-wrap">
+    <div class="search-box">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M10.5 10.5l3 3"/></svg>
+      <input class="search-input" id="searchInput" type="text" placeholder="Pesquisar produto, solicitante, alteração..." oninput="onSearch(this.value)" />
     </div>
+    <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+    <span class="search-count" id="searchCount"></span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>Data do registro</th><th>Nº Ped.</th><th>Produto</th><th>Módulo</th>
+        <th>Setor origem</th><th>Solicitante</th><th>Alteração solicitada</th>
+        <th>Prioridade</th><th>Tipo</th><th>Status</th><th>Responsável</th>
+      </tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
 
-    <!-- INDICADOR NC -->
-    <div class="card" style="margin-bottom:14px;" id="cardIndicador">
-      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
-        <span>Indicador de não conformidades · 2026</span>
-        <span style="color:var(--accent2);font-family:var(--mono);font-size:11px;">NC's / 100 peças produzidas</span>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-        <div><div style="position:relative;height:220px;"><canvas id="chartIndicador" role="img" aria-label="Multiplicador NC por semana"></canvas></div></div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Mês</th><th>Semana</th><th>NC's</th><th>Peças</th><th>% Ocorr.</th><th>Mult./100</th></tr></thead>
-            <tbody id="indicadorBody"></tbody>
-          </table>
-        </div>
-      </div>
+<!-- INDICADOR NC -->
+<div class="card" style="margin-bottom:14px;" id="cardIndicador">
+  <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+    <span>Indicador de não conformidades · 2026</span>
+    <span style="color:var(--accent2);font-family:var(--mono);font-size:11px;">NC's / 100 peças produzidas</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div><div style="position:relative;height:220px;"><canvas id="chartIndicador" role="img" aria-label="Multiplicador NC por semana"></canvas></div></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Mês</th><th>Semana</th><th>NC's</th><th>Peças</th><th>% Ocorr.</th><th>Mult./100</th></tr></thead>
+        <tbody id="indicadorBody"></tbody>
+      </table>
     </div>
+  </div>
+</div>
 
-    <div class="footer">
-      <div style="display:flex;align-items:center;gap:16px;">
-        <span class="footer-text">© Junior Corrêa · Todos os direitos reservados</span>
-      </div>
-      <span class="footer-text" style="opacity:0.3;font-size:10px;">v1.0</span>
-    </div>
+<div class="footer">
+  <div style="display:flex;align-items:center;gap:16px;">
+    <span class="footer-text">© Junior Corrêa · Todos os direitos reservados</span>
+  </div>
+  <span class="footer-text" style="opacity:0.3;font-size:10px;">v1.0</span>
+</div>
+```
+
   </div>
 </div>
 
@@ -509,7 +530,12 @@ function render(data) {
   makeBars('barSetores',    count(data,COL.SETOR_ORIG), '#7c6af7');
   makeBars('barSolicitantes',count(data,COL.SOLICITANTE),'#4ea8e8');
 
-  // Tabela mostra todos os registros (incluindo anulados), aplicando só período e setor
+  // Tabela — renderizada via renderTable() para suportar busca independente
+  renderTable();
+}
+
+// ── RENDER TABELA (separado para busca em tempo real) ─────────────────
+function renderTable() {
   let tableData = allData;
   const tableRange = getPeriodRange();
   if (tableRange) {
@@ -518,8 +544,25 @@ function render(data) {
   }
   if (activeSetor !== 'all')
     tableData = tableData.filter(r => (r[COL.SETOR_ORIG]||'').toString().trim() === activeSetor);
-  const recentWithIdx = [...tableData].map((r) => ({ r, realIdx: allData.indexOf(r) })).reverse().slice(0,50);
-  document.getElementById('tableCount').textContent = tableData.length+' registros';
+
+  // Filtro de busca — pesquisa em produto, solicitante, alteração, módulo, setor, responsável
+  let filtered = tableData;
+  if (searchTerm) {
+    filtered = tableData.filter(r => {
+      const haystack = [
+        r[COL.PRODUTO], r[COL.SOLICITANTE], r[COL.ALTERACAO],
+        r[COL.MODULO], r[COL.SETOR_ORIG], r[COL.RESPONSAVEL],
+        r[COL.NUM_PED], r[COL.TIPO], r[COL.STATUS]
+      ].join(' ').toLowerCase();
+      return haystack.includes(searchTerm);
+    });
+    document.getElementById('searchCount').textContent = filtered.length + ' resultado' + (filtered.length !== 1 ? 's' : '');
+  } else {
+    document.getElementById('searchCount').textContent = '';
+  }
+
+  const recentWithIdx = [...filtered].map((r) => ({ r, realIdx: allData.indexOf(r) })).reverse().slice(0,50);
+  document.getElementById('tableCount').textContent = filtered.length+' registros';
   const prioClass = {'urgente':'p-urgente','alta':'p-alta','média':'p-media','media':'p-media','baixa':'p-baixa'};
   const tipoClass = {'não conformidade':'p-nc','melhoria':'p-melhoria','alteração':'p-alteracao','assistência':'p-assistencia','assistencia':'p-assistencia'};
   const statClass = s => { const v=s.toLowerCase(); if(v==='anulada') return 'p-anulada'; return (v.includes('finaliz')||v.includes('atendida'))?'p-finalizado':'p-aberto'; };
@@ -595,152 +638,170 @@ function render(data) {
             <div>
               <div class="accordion-label" style="margin-bottom:4px;">Tratativa / Impacto</div>
               <textarea class="acc-edit-area" id="${uid}-area" style="display:block;min-height:70px;" placeholder="Digite a tratativa...">${impactoEscaped}</textarea>
-            </div>
-          </div>
-          <div class="acc-actions" id="${uid}-actions" style="display:flex;">
-            <input type="password" class="acc-senha" id="${uid}-senha" placeholder="Senha" />
-            <button class="acc-btn save" onclick="salvarTratativa('${uid}', ${realIdx})">Salvar</button>
-            <button class="acc-btn" onclick="cancelEdit('${uid}')">Cancelar</button>
-            <span class="acc-msg" id="${uid}-msg"></span>
-          </div>
+
+```
         </div>
-      </td>
-    </tr>`;
-  }).join('');
+      </div>
+      <div class="acc-actions" id="${uid}-actions" style="display:flex;">
+        <input type="password" class="acc-senha" id="${uid}-senha" placeholder="Senha" />
+        <button class="acc-btn save" onclick="salvarTratativa('${uid}', ${realIdx})">Salvar</button>
+        <button class="acc-btn" onclick="cancelEdit('${uid}')">Cancelar</button>
+        <span class="acc-msg" id="${uid}-msg"></span>
+      </div>
+    </div>
+  </td>
+</tr>`;
+```
+
+}).join(’’);
 }
 
 // ── INDICADOR NC ───────────────────────────────────────────────────────
 function renderIndicador(rows) {
-  if(!rows||rows.length===0){ document.getElementById('cardIndicador').style.display='none'; return; }
-  document.getElementById('cardIndicador').style.display='block';
-  const labels = rows.map(r=>(r[0]||'').toString().trim().slice(0,3)+' S'+(r[1]||'').toString().trim());
-  const mult   = rows.map(r=>parseFloat((r[5]||'0').toString().replace(',','.'))||0);
-  // Linha de tendência linear (regressão simples)
-  const n = mult.length;
-  const sumX = mult.reduce((_,__,i)=>_+i, 0);
-  const sumY = mult.reduce((a,b)=>a+b, 0);
-  const sumXY = mult.reduce((a,v,i)=>a+i*v, 0);
-  const sumX2 = mult.reduce((a,_,i)=>a+i*i, 0);
-  const slope = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX);
-  const intercept = (sumY - slope*sumX) / n;
-  const trend = mult.map((_,i) => parseFloat((intercept + slope*i).toFixed(2)));
+if(!rows||rows.length===0){ document.getElementById(‘cardIndicador’).style.display=‘none’; return; }
+document.getElementById(‘cardIndicador’).style.display=‘block’;
+const labels = rows.map(r=>(r[0]||’’).toString().trim().slice(0,3)+’ S’+(r[1]||’’).toString().trim());
+const mult   = rows.map(r=>parseFloat((r[5]||‘0’).toString().replace(’,’,’.’))||0);
+// Linha de tendência linear (regressão simples)
+const n = mult.length;
+const sumX = mult.reduce((*,__,i)=>*+i, 0);
+const sumY = mult.reduce((a,b)=>a+b, 0);
+const sumXY = mult.reduce((a,v,i)=>a+i*v, 0);
+const sumX2 = mult.reduce((a,_,i)=>a+i*i, 0);
+const slope = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX);
+const intercept = (sumY - slope*sumX) / n;
+const trend = mult.map((_,i) => parseFloat((intercept + slope*i).toFixed(2)));
 
-  // Cor dos pontos: acima da tendência = vermelho, abaixo = verde
-  const pointColors = mult.map((v,i) => v > trend[i] ? '#f05b5b' : '#4ecb8d');
+// Cor dos pontos: acima da tendência = vermelho, abaixo = verde
+const pointColors = mult.map((v,i) => v > trend[i] ? ‘#f05b5b’ : ‘#4ecb8d’);
 
-  if(charts['chartIndicador']) charts['chartIndicador'].destroy();
-  charts['chartIndicador'] = new Chart(document.getElementById('chartIndicador'), {
-    type:'line',
-    data:{ labels, datasets:[
-      { label:'Multiplicador /100', data:mult, borderColor:'#7c6af7', backgroundColor:'rgba(124,106,247,0.07)',
-        borderWidth:2, pointRadius:5, pointBackgroundColor:pointColors, pointBorderColor:pointColors, fill:true, tension:0.3 },
-      { label:'Tendência', data:trend,
-        borderColor:'#f0a63a', borderWidth:1.5, borderDash:[6,4], pointRadius:0, fill:false, tension:0 }
-    ]},
-    options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{labels:{color:'#9090a0',font:{family:'DM Mono',size:10},boxWidth:10}},
-        tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': '+ctx.parsed.y.toFixed(2)}} },
-      scales:{
-        x:{ticks:{color:'#5a5a6a',font:{family:'DM Mono',size:10},maxRotation:45},grid:{color:'rgba(255,255,255,0.04)'}},
-        y:{ticks:{color:'#5a5a6a',font:{family:'DM Mono',size:10}},grid:{color:'rgba(255,255,255,0.04)'},min:0}
-      }}
-  });
-  document.getElementById('indicadorBody').innerHTML = rows.map(r => {
-    const multVal = parseFloat((r[5]||'0').toString().replace(',','.'))||0;
-    const pct     = parseFloat((r[4]||'0').toString().replace(',','.'));
-    const META    = 3.0;
-    return `<tr>
-      <td style="text-transform:capitalize">${r[0]||'—'}</td>
-      <td style="font-family:var(--mono);text-align:center">${r[1]||'—'}</td>
-      <td style="font-family:var(--mono);text-align:center;color:var(--text)">${r[2]||'—'}</td>
-      <td style="font-family:var(--mono);text-align:center;color:var(--text3)">${r[3]||'—'}</td>
-      <td style="font-family:var(--mono);text-align:center">${isNaN(pct)||pct===0?'—':(pct*100).toFixed(2)+'%'}</td>
-      <td style="text-align:center"><span class="pill ${multVal>META?'p-urgente':'p-finalizado'}">${multVal.toFixed(1)}</span></td>
-    </tr>`;
-  }).join('');
+if(charts[‘chartIndicador’]) charts[‘chartIndicador’].destroy();
+charts[‘chartIndicador’] = new Chart(document.getElementById(‘chartIndicador’), {
+type:‘line’,
+data:{ labels, datasets:[
+{ label:‘Multiplicador /100’, data:mult, borderColor:’#7c6af7’, backgroundColor:‘rgba(124,106,247,0.07)’,
+borderWidth:2, pointRadius:5, pointBackgroundColor:pointColors, pointBorderColor:pointColors, fill:true, tension:0.3 },
+{ label:‘Tendência’, data:trend,
+borderColor:’#f0a63a’, borderWidth:1.5, borderDash:[6,4], pointRadius:0, fill:false, tension:0 }
+]},
+options:{ responsive:true, maintainAspectRatio:false,
+plugins:{ legend:{labels:{color:’#9090a0’,font:{family:‘DM Mono’,size:10},boxWidth:10}},
+tooltip:{callbacks:{label:ctx=>’ ‘+ctx.dataset.label+’: ‘+ctx.parsed.y.toFixed(2)}} },
+scales:{
+x:{ticks:{color:’#5a5a6a’,font:{family:‘DM Mono’,size:10},maxRotation:45},grid:{color:‘rgba(255,255,255,0.04)’}},
+y:{ticks:{color:’#5a5a6a’,font:{family:‘DM Mono’,size:10}},grid:{color:‘rgba(255,255,255,0.04)’},min:0}
+}}
+});
+document.getElementById(‘indicadorBody’).innerHTML = rows.map(r => {
+const multVal = parseFloat((r[5]||‘0’).toString().replace(’,’,’.’))||0;
+const pct     = parseFloat((r[4]||‘0’).toString().replace(’,’,’.’));
+const META    = 3.0;
+return `<tr> <td style="text-transform:capitalize">${r[0]||'—'}</td> <td style="font-family:var(--mono);text-align:center">${r[1]||'—'}</td> <td style="font-family:var(--mono);text-align:center;color:var(--text)">${r[2]||'—'}</td> <td style="font-family:var(--mono);text-align:center;color:var(--text3)">${r[3]||'—'}</td> <td style="font-family:var(--mono);text-align:center">${isNaN(pct)||pct===0?'—':(pct*100).toFixed(2)+'%'}</td> <td style="text-align:center"><span class="pill ${multVal>META?'p-urgente':'p-finalizado'}">${multVal.toFixed(1)}</span></td> </tr>`;
+}).join(’’);
+}
+
+// ── BUSCA NA TABELA ───────────────────────────────────────────────────
+let searchTerm = ‘’;
+
+function onSearch(val) {
+searchTerm = val.toLowerCase().trim();
+document.getElementById(‘searchClear’).style.display = searchTerm ? ‘block’ : ‘none’;
+renderTable();
+}
+
+function clearSearch() {
+document.getElementById(‘searchInput’).value = ‘’;
+searchTerm = ‘’;
+document.getElementById(‘searchClear’).style.display = ‘none’;
+document.getElementById(‘searchCount’).textContent = ‘’;
+renderTable();
 }
 
 // ── ACCORDION + EDIÇÃO DE TRATATIVA ───────────────────────────────────
 function toggleAccordion(uid, row) {
-  const acc = document.getElementById(uid);
-  const isOpen = acc.classList.contains('open');
-  acc.classList.toggle('open', !isOpen);
-  row.classList.toggle('open', !isOpen);
+const acc = document.getElementById(uid);
+const isOpen = acc.classList.contains(‘open’);
+acc.classList.toggle(‘open’, !isOpen);
+row.classList.toggle(‘open’, !isOpen);
 }
 
 function startEdit(uid) {
-  document.getElementById(uid+'-text').style.display = 'none';
-  document.getElementById(uid+'-editor').style.display = 'block';
-  document.getElementById(uid+'-area').focus();
+document.getElementById(uid+’-text’).style.display = ‘none’;
+document.getElementById(uid+’-editor’).style.display = ‘block’;
+document.getElementById(uid+’-area’).focus();
 }
 
 function cancelEdit(uid) {
-  document.getElementById(uid+'-text').style.display = 'block';
-  document.getElementById(uid+'-editor').style.display = 'none';
-  document.getElementById(uid+'-msg').textContent = '';
+document.getElementById(uid+’-text’).style.display = ‘block’;
+document.getElementById(uid+’-editor’).style.display = ‘none’;
+document.getElementById(uid+’-msg’).textContent = ‘’;
 }
 
 async function salvarTratativa(uid, rowIndex) {
-  const tratativa   = document.getElementById(uid+'-area').value.trim();
-  const responsavel = document.getElementById(uid+'-resp').value.trim();
-  const status      = document.getElementById(uid+'-status').value.trim();
-  const dataConc    = document.getElementById(uid+'-dataconc').value;
-  const senha       = document.getElementById(uid+'-senha').value;
-  const msgEl       = document.getElementById(uid+'-msg');
+const tratativa   = document.getElementById(uid+’-area’).value.trim();
+const responsavel = document.getElementById(uid+’-resp’).value.trim();
+const status      = document.getElementById(uid+’-status’).value.trim();
+const dataConc    = document.getElementById(uid+’-dataconc’).value;
+const senha       = document.getElementById(uid+’-senha’).value;
+const msgEl       = document.getElementById(uid+’-msg’);
 
-  if (!senha) { msgEl.style.color='#f05b5b'; msgEl.textContent = 'Digite a senha.'; return; }
+if (!senha) { msgEl.style.color=’#f05b5b’; msgEl.textContent = ‘Digite a senha.’; return; }
 
-  msgEl.style.color = 'var(--text3)';
-  msgEl.textContent = 'Salvando...';
+msgEl.style.color = ‘var(–text3)’;
+msgEl.textContent = ‘Salvando…’;
 
-  // Converte data de yyyy-mm-dd para dd/MM/yyyy para gravar na planilha
-  let dataConcFmt = '';
-  if (dataConc) {
-    const [y,m,d] = dataConc.split('-');
-    dataConcFmt = d+'/'+m+'/'+y;
-  }
+// Converte data de yyyy-mm-dd para dd/MM/yyyy para gravar na planilha
+let dataConcFmt = ‘’;
+if (dataConc) {
+const [y,m,d] = dataConc.split(’-’);
+dataConcFmt = d+’/’+m+’/’+y;
+}
 
-  try {
-    const params = new URLSearchParams({
-      acao: 'salvar', senha, rowIndex,
-      tratativa, responsavel, status, dataConc: dataConcFmt
-    });
-    const res  = await fetch(SHEETS_URL + '?' + params.toString());
-    const json = await res.json();
+try {
+const params = new URLSearchParams({
+acao: ‘salvar’, senha, rowIndex,
+tratativa, responsavel, status, dataConc: dataConcFmt
+});
+const res  = await fetch(SHEETS_URL + ‘?’ + params.toString());
+const json = await res.json();
 
-    if (json.ok) {
-      msgEl.style.color = '#4ecb8d';
-      msgEl.textContent = '✓ Salvo!';
-      document.getElementById(uid+'-resp-text').textContent = responsavel || '—';
-      document.getElementById(uid+'-trat-text').innerHTML = tratativa
-        ? `<div class="accordion-text">${tratativa}</div>`
-        : '<div class="accordion-empty">Nenhuma tratativa registrada.</div>';
-      setTimeout(() => cancelEdit(uid), 1000);
-    } else {
-      msgEl.style.color = '#f05b5b';
-      msgEl.textContent = json.erro || 'Erro ao salvar.';
-    }
-  } catch(err) {
-    msgEl.style.color = '#f05b5b';
-    msgEl.textContent = 'Erro de conexão.';
-  }
+```
+if (json.ok) {
+  msgEl.style.color = '#4ecb8d';
+  msgEl.textContent = '✓ Salvo!';
+  document.getElementById(uid+'-resp-text').textContent = responsavel || '—';
+  document.getElementById(uid+'-trat-text').innerHTML = tratativa
+    ? `<div class="accordion-text">${tratativa}</div>`
+    : '<div class="accordion-empty">Nenhuma tratativa registrada.</div>';
+  setTimeout(() => cancelEdit(uid), 1000);
+} else {
+  msgEl.style.color = '#f05b5b';
+  msgEl.textContent = json.erro || 'Erro ao salvar.';
+}
+```
+
+} catch(err) {
+msgEl.style.color = ‘#f05b5b’;
+msgEl.textContent = ‘Erro de conexão.’;
+}
 }
 
 // ── ACESSO SECRETO (3 cliques no título) ──────────────────────────────
 let secretClicks = 0;
 let secretTimer  = null;
 function handleSecretClick() {
-  secretClicks++;
-  clearTimeout(secretTimer);
-  if (secretClicks >= 3) {
-    secretClicks = 0;
-    window.open('https://docs.google.com/spreadsheets/d/1l73oePNwk4bG7rL17IlOLNYs2oC1USrP1WPgtf6bTs0/edit', '_blank');
-  } else {
-    secretTimer = setTimeout(() => { secretClicks = 0; }, 600);
-  }
+secretClicks++;
+clearTimeout(secretTimer);
+if (secretClicks >= 3) {
+secretClicks = 0;
+window.open(‘https://docs.google.com/spreadsheets/d/1l73oePNwk4bG7rL17IlOLNYs2oC1USrP1WPgtf6bTs0/edit’, ‘_blank’);
+} else {
+secretTimer = setTimeout(() => { secretClicks = 0; }, 600);
+}
 }
 
 loadData();
 </script>
+
 </body>
 </html>
