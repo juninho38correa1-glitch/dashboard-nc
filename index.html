@@ -308,8 +308,9 @@ const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzB_rXJGFEfDWEwbgKTL
 
 let allData      = [];
 let indData      = [];
-let activeSetor   = 'all';
+let activeSetor  = 'all';
 let activePeriod = 'total';
+let searchTerm   = '';
 let charts       = {};
 
 const COL = {
@@ -701,8 +702,6 @@ return `<tr> <td style="text-transform:capitalize">${r[0]||'—'}</td> <td style
 }
 
 // ── BUSCA NA TABELA ───────────────────────────────────────────────────
-let searchTerm = ‘’;
-
 function onSearch(val) {
 searchTerm = val.toLowerCase().trim();
 document.getElementById(‘searchClear’).style.display = searchTerm ? ‘block’ : ‘none’;
